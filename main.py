@@ -1,5 +1,4 @@
 import random
-
 import pygame
 
 pygame.init()
@@ -95,32 +94,57 @@ class Point:
         self.y = y
 
     def pos(self):
-        return (self.x, self.y)
+        return [self.x, self.y]
 
 
 class Rect:
-    def __init__(self, x1, x2, y1, y2):
-        self.X1 = x1
-        self.X2 = x2
-        self.Y1 = y1
-        self.Y2 = y2
-
-# Returns true if two rectangles(l1, r1)
-# and (l2, r2) overlap
+    def __init__(self, poin1, poin2):
+        self.X1 = poin1[0]
+        self.X2 = poin2[0]
+        self.Y1 = poin1[1]
+        self.Y2 = poin2[1]
 
 
-def doOverlap(RectA, RectB):
+# def doOverlap(RectA, RectB):
 
-    return RectA.X1 < RectB.X2 and RectA.X2 > RectB.X1 and RectA.Y1 > RectB.Y2 and RectA.Y2 < RectB.Y1
+#     return RectA.X1 < RectB.X2 and RectA.X2 > RectB.X1 and RectA.Y1 > RectB.Y2 and RectA.Y2 < RectB.Y1
+
+def doOverlap(l1, r1, l2, r2):
+
+    # To check if either rectangle is actually a line
+    # For example  :  l1 ={-1,0}  r1={1,1}  l2={0,-1}  r2={0,1}
+
+    # if (l1.x == r1.x or l1.y == r1.y or l2.x == r2.x or l2.y == r2.y):
+    #     # the line cannot have positive overlap
+    #     return False
+
+    # If one rectangle is on left side of other
+    print(l1.pos(), r1.pos(), l2.pos(), r2.pos())
+    if(l1.x >= r2.x or l2.x >= r1.x):
+
+        return False
+
+    # If one rectangle is above other
+    if(r1.y >= l2.y or r2.y >= l1.y):
+        return False
+
+    return True
 
 
-running=True
-gameStart=False
+def isOutOfRoad(roadX1, roadX2, posCarX):
+    return roadX1 <= posCarX and roadX2 >= posCarX
+
+
+running = True
+gameStart = True    
+
 while running:
     screen.fill(color)
     clock.tick(fps)
     showImg(roadImg, 150, roadY)
     showImg(heroCar, posOfHeroCarX, posOfHeroCarY)
+    showImg(pointImg, 200, 12)
+    showImg(pointImg, 100+512, 12)
     showImg(imgLeft, 50, imgLeftY)
     showImg(imgRight, 620, imgRightY)
     showImg(villianOne, 260, villianOneY)
@@ -128,69 +152,83 @@ while running:
     showImg(villianTwo, 415, villianTwoY)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running=False
+            running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if pygame.mouse.get_pos()[0] >= 150 and pygame.mouse.get_pos()[1] >= 230:
                 if pygame.mouse.get_pos()[0] <= 250 and pygame.mouse.get_pos()[1] <= 280:
-                    running=False
+                    running = False
 
             if pygame.mouse.get_pos()[0] >= 150 and pygame.mouse.get_pos()[1] >= 90:
                 if pygame.mouse.get_pos()[0] <= 250 and pygame.mouse.get_pos()[1] <= 140:
                     startGame()
         if event.type == pygame.KEYDOWN:
-            pressed=pygame.key.get_pressed()
+            pressed = pygame.key.get_pressed()
             if pressed[pygame.K_LEFT]:
-                heroCarChangeX=-2
+                heroCarChangeX = -2
             elif pressed[pygame.K_RIGHT]:
-                heroCarChangeX=2
+                heroCarChangeX = 2
+            elif pressed[pygame.K_SPACE]:
+                gameStart = not gameStart 
         if event.type == pygame.KEYUP:
 
             if event.key == pygame.K_LEFT:
-                heroCarChangeX=0
+                heroCarChangeX = 0
             elif event.key == pygame.K_RIGHT:
-                heroCarChangeX=0
+                heroCarChangeX = 0
+            # elif event.key == pygame.K_SPACE:
+            #     gameStart = True                                        
+              
 
     # All calculation will be here
-
+    if not gameStart:
+        continue
     imgRightY += speedOfHeroCar
     imgLeftY += speedOfHeroCar
     roadY += speedOfHeroCar
     villianOneY += villianSpeed
     villianTwoY += villianSpeed
     posOfHeroCarX += heroCarChangeX
-    l1=Point(260, villianOneY)
-    r1=Point(260+128, villianOneY+128)
-    l2=Point(415, villianTwoY)
-    r2=Point(415+128, villianTwoY+128)
-    carLeftCorner=Point(posOfHeroCarX+20, posOfHeroCarY)
 
-    carRightCorner=Point(posOfHeroCarX+128-35, posOfHeroCarY+130)
+    l1 = Point(260, villianOneY)
+    r1 = Point(260+128, villianOneY+128)
+
+    l2 = Point(415, villianTwoY)
+    r2 = Point(415+128, villianTwoY+128)
+
+    carLeftCorner = Point(posOfHeroCarX+20, posOfHeroCarY)
+
+    carRightCorner = Point(posOfHeroCarX+128-35, posOfHeroCarY+130)
 
     showImg(pointImg, *l1.pos())
     showImg(pointImg2, *r1.pos())
     showImg(pointImg, *carLeftCorner.pos())
     showImg(pointImg2, *carRightCorner.pos())
 
-    showImg(pointImg, *l2.pos())
-    showImg(pointImg2, *r2.pos())
-
-    # if (doOverlap(Rect(*l1.pos(), *r1.pos()), Rect(*carLeftCorner.pos(), *carRightCorner()))):
-    #     print("Crushed")
+    # showImg(pointImg, *l2.pos())
+    # showImg(pointImg2, *r2.pos())
+    # print(*l1.pos(),*r1.pos())
+    if (doOverlap(l1, r1, carLeftCorner, carRightCorner)):
+        print("Crushed")
 
     if isOutOfScreenY(height, imgLeftY):
-        imgLeftY=-128
-        imgLeft=random.choice(lstOfAssets)
+        imgLeftY = -128
+        imgLeft = random.choice(lstOfAssets)
 
     if isOutOfScreenY(height, imgRightY):
-        imgRightY=-128
-        imgRight=random.choice(lstOfAssets)
+        imgRightY = -128
+        imgRight = random.choice(lstOfAssets)
 
     if isOutOfScreenY(-512, roadY):
-        roadY=-985
+        roadY = -985
     if isOutOfScreenY(height, villianOneY):
-        villianOneY=-128
-        villianOne=random.choice(lstBadCars)
+        villianOneY = -128
+        villianOne = random.choice(lstBadCars)
     if isOutOfScreenY(height, villianTwoY):
-        villianTwoY=-512
-        villianTwo=random.choice(lstBadCars)
+        villianTwoY = -512
+        villianTwo = random.choice(lstBadCars)
+
+    if posOfHeroCarX >= 100+370:
+        heroCarChangeX = 0
+    if posOfHeroCarX <= 210:
+        heroCarChangeX = 0
     pygame.display.flip()
