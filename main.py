@@ -111,8 +111,8 @@ class Rect:
 
 def doOverlap(l1, r1, heroLeft, heroRight):
     if heroLeft.y-128 <= l1.y and heroLeft.y+130>=l1.y:
-            return True
-        return False
+        return True
+    return False
 
 
 
