@@ -195,7 +195,7 @@ while running:
     # print(*l1.pos(),*r1.pos())
     if (doOverlap(l1, r1, carLeftCorner, carRightCorner)):
         print("Crushed")
-    if (doOverlap(l2, r, carLeftCorner, carRightCorner)):
+    if (doOverlap(l2, r2, carLeftCorner, carRightCorner)):
         print("Crushed")
 
     if isOutOfScreenY(height, imgLeftY):
