@@ -58,7 +58,7 @@ villianTwo = random.choice(lstBadCars)
 lstOfPosOfBadCarsY = [-128, -512]
 villianTwoY = -128
 villianOneY = -512
-villianSpeed = 3
+villianSpeed = 1
 
 # Buttons
 
@@ -109,26 +109,26 @@ class Rect:
 
 #     return RectA.X1 < RectB.X2 and RectA.X2 > RectB.X1 and RectA.Y1 > RectB.Y2 and RectA.Y2 < RectB.Y1
 
-def doOverlap(l1, r1, l2, r2):
+def doOverlap(l1, r1, heroLeft, heroRight):
 
     # To check if either rectangle is actually a line
-    # For example  :  l1 ={-1,0}  r1={1,1}  l2={0,-1}  r2={0,1}
+    # For example  :  l1 ={-1,0}  r1={1,1}  heroLeft={0,-1}  heroRight={0,1}
 
-    # if (l1.x == r1.x or l1.y == r1.y or l2.x == r2.x or l2.y == r2.y):
+    # if (l1.x == r1.x or l1.y == r1.y or heroLeft.x == heroRight.x or heroLeft.y == heroRight.y):
     #     # the line cannot have positive overlap
     #     return False
 
     # If one rectangle is on left side of other
-    print(l1.pos(), r1.pos(), l2.pos(), r2.pos())
-    if(l1.x >= r2.x or l2.x >= r1.x):
+    print(l1.pos(), r1.pos(), heroLeft.pos(), heroRight.pos())
+    # if(l1.x <= heroRight.x or heroLeft.x <= r1.x):
 
-        return False
+    #     return True
 
-    # If one rectangle is above other
-    if(r1.y >= l2.y or r2.y >= l1.y):
-        return False
+    # # If one rectangle is above other
+    # if(r1.y <= heroLeft.y or heroRight.y <= l1.y):
+    #     return False
 
-    return True
+
 
 
 def isOutOfRoad(roadX1, roadX2, posCarX):
@@ -208,6 +208,8 @@ while running:
     # showImg(pointImg2, *r2.pos())
     # print(*l1.pos(),*r1.pos())
     if (doOverlap(l1, r1, carLeftCorner, carRightCorner)):
+        print("Crushed")
+    if (doOverlap(l2, r, carLeftCorner, carRightCorner)):
         print("Crushed")
 
     if isOutOfScreenY(height, imgLeftY):
