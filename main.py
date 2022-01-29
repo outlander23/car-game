@@ -110,23 +110,9 @@ class Rect:
 #     return RectA.X1 < RectB.X2 and RectA.X2 > RectB.X1 and RectA.Y1 > RectB.Y2 and RectA.Y2 < RectB.Y1
 
 def doOverlap(l1, r1, heroLeft, heroRight):
-
-    # To check if either rectangle is actually a line
-    # For example  :  l1 ={-1,0}  r1={1,1}  heroLeft={0,-1}  heroRight={0,1}
-
-    # if (l1.x == r1.x or l1.y == r1.y or heroLeft.x == heroRight.x or heroLeft.y == heroRight.y):
-    #     # the line cannot have positive overlap
-    #     return False
-
-    # If one rectangle is on left side of other
-    print(l1.pos(), r1.pos(), heroLeft.pos(), heroRight.pos())
-    # if(l1.x <= heroRight.x or heroLeft.x <= r1.x):
-
-    #     return True
-
-    # # If one rectangle is above other
-    # if(r1.y <= heroLeft.y or heroRight.y <= l1.y):
-    #     return False
+    if heroLeft.y-128 <= l1.y and heroLeft.y+130>=l1.y:
+            return True
+        return False
 
 
 
