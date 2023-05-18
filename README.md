@@ -1,6 +1,6 @@
 # Pygame Car Game
 
-![Gameplay Screenshot](screenshot.png) _(You can include an optional screenshot of the game)_
+![Screenshot from 2023-05-18 19-55-14](https://github.com/miloy23/car-game/assets/81033586/4f427fb9-88e8-4e85-b5e7-edc347a933b6)
 
 ## Description
 
@@ -18,6 +18,6 @@ This is a simple car game built using the Pygame library. The objective of the g
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/miloy23/pygame_car_game.git
+   git clone https://github.com/miloy23/car_game.git
 
 
