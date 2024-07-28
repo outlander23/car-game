@@ -12,13 +12,11 @@ screen = pygame.display.set_mode(screenSize)
 clock = pygame.time.Clock()
 color = (0, 250, 0)
 
-
 heroCar = pygame.image.load("assets/hero/car.png")
 heroCar = pygame.transform.scale(heroCar, (128, 128))
 heroCar = pygame.transform.flip(heroCar, False, True)
 roadImg = pygame.image.load("assets/road.png")
 roadImg = pygame.transform.scale(roadImg, (512, 2048))
-
 
 badCar = pygame.image.load("assets/villains/car (1).png")
 badCar2 = pygame.image.load("assets/villains/car (2).png")
@@ -29,7 +27,6 @@ badCar3 = pygame.transform.flip(badCar3, False, True)
 pointImg = pygame.image.load("assets/basketball.png")
 pointImg = pygame.transform.scale(pointImg, (5, 5))
 pointImg2 = pygame.transform.scale(pointImg, (10, 10))
-# assets
 
 tree1 = pygame.image.load("assets/trees/tree (1).png")
 tree1 = pygame.transform.scale(tree1, (128, 128))
@@ -60,33 +57,24 @@ villianTwoY = -128
 villianOneY = -512
 villianSpeed = 1
 
-# Buttons
+def start_button():
+    return pygame.draw.rect(screen, (120, 120, 123), (150, 90, 100, 50), border_radius=20)
 
+def continue_button():
+    return pygame.draw.rect(screen, (0, 244, 0), (150, 160, 100, 50))
 
-def start_button(): return pygame.draw.rect(
-    screen, (120, 120, 123), (150, 90, 100, 50), border_radius=20)
-
-
-def continue_button(): return pygame.draw.rect(
-    screen, (0, 244, 0), (150, 160, 100, 50))
-
-
-def quit_button(): return pygame.draw.rect(
-    screen, (244, 0, 0), (150, 230, 100, 50))
-
+def quit_button():
+    return pygame.draw.rect(screen, (244, 0, 0), (150, 230, 100, 50))
 
 def startGame():
+    global gameStart
     gameStart = True
-
 
 def showImg(img, x, y):
     screen.blit(img, (x, y))
 
-
 def isOutOfScreenY(screenY, imgY):
-
     return screenY < imgY
-
 
 class Point:
     def __init__(self, x, y):
@@ -96,59 +84,69 @@ class Point:
     def pos(self):
         return [self.x, self.y]
 
+class SimpleAI:
+    def __init__(self, car_x, car_y, speed):
+        self.car_x = car_x
+        self.car_y = car_y
+        self.speed = speed
+        self.change_x = 0
+    
+    def update(self, obstacles, road_bounds):
+        self.change_x = 0
+        for obstacle in obstacles:
+            if self.is_collision(obstacle):
+                if self.car_x < obstacle[0]:
+                    self.change_x = -2  # Move left
+                else:
+                    self.change_x = 2  # Move right
+        
+        if self.car_x <= road_bounds[0]:
+            self.change_x = 2
+        elif self.car_x >= road_bounds[1]:
+            self.change_x = -2
+        
+        self.car_x += self.change_x
+    
+    def is_collision(self, obstacle):
+        car_rect = pygame.Rect(self.car_x, self.car_y, 128, 128)
+        obstacle_rect = pygame.Rect(obstacle[0], obstacle[1], obstacle[2], obstacle[3])
+        return car_rect.colliderect(obstacle_rect)
+    
+    def get_position(self):
+        return self.car_x, self.car_y
 
-class Rect:
-    def __init__(self, poin1, poin2):
-        self.X1 = poin1[0]
-        self.X2 = poin2[0]
-        self.Y1 = poin1[1]
-        self.Y2 = poin2[1]
-
-
-# def doOverlap(RectA, RectB):
-#     return RectA.X1 < RectB.X2 and RectA.X2 > RectB.X1 and RectA.Y1 > RectB.Y2 and RectA.Y2 < RectB.Y1
-
-	# # If one rectangle is on left side of other
-	# if(l1.x >= r2.x or l2.x >= r1.x):
-	# 	return False
-
-	# # If one rectangle is above other
-	# if(r1.y >= l2.y or r2.y >= l1.y):
-	# 	return False
 def doOverlap(l1, r1, l2, r2):
-    # Check if one rectangle is on the left side of the other
     if l1.x > r2.x or l2.x > r1.x:
         return False
-
-    # Check if one rectangle is above the other
     if l1.y > r2.y or l2.y > r1.y:
         return False
-
     return True
 
 def isOutOfRoad(roadX1, roadX2, posCarX):
     return roadX1 <= posCarX and roadX2 >= posCarX
 
-
 running = True
-gameStart = True    
+gameStart = True
 
-
+ai_car = SimpleAI(posOfHeroCarX, posOfHeroCarY, speedOfHeroCar)
 start = 1
 
 while running:
     screen.fill(color)
     clock.tick(fps)
+    
+    ai_car.update([(260, villianOneY, 128, 128), (415, villianTwoY, 128, 128)], (210, 510))
+    ai_car_x, ai_car_y = ai_car.get_position()
 
     showImg(roadImg, 150, roadY)
-    showImg(heroCar, posOfHeroCarX, posOfHeroCarY)
+    showImg(heroCar, ai_car_x, ai_car_y)
     showImg(pointImg, 200, 12)
     showImg(pointImg, 100+512, 12)
     showImg(imgLeft, 50, imgLeftY)
     showImg(imgRight, 620, imgRightY)
     showImg(villianOne, 260, villianOneY)
-
     showImg(villianTwo, 415, villianTwoY)
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -156,7 +154,6 @@ while running:
             if pygame.mouse.get_pos()[0] >= 150 and pygame.mouse.get_pos()[1] >= 230:
                 if pygame.mouse.get_pos()[0] <= 250 and pygame.mouse.get_pos()[1] <= 280:
                     running = False
-
             if pygame.mouse.get_pos()[0] >= 150 and pygame.mouse.get_pos()[1] >= 90:
                 if pygame.mouse.get_pos()[0] <= 250 and pygame.mouse.get_pos()[1] <= 140:
                     startGame()
@@ -169,18 +166,14 @@ while running:
             elif pressed[pygame.K_SPACE]:
                 gameStart = not gameStart 
         if event.type == pygame.KEYUP:
-
             if event.key == pygame.K_LEFT:
                 heroCarChangeX = 0
             elif event.key == pygame.K_RIGHT:
                 heroCarChangeX = 0
-            # elif event.key == pygame.K_SPACE:
-            #     gameStart = True                                        
-              
 
-    # All calculation will be here
     if not gameStart:
         continue
+
     imgRightY += speedOfHeroCar
     imgLeftY += speedOfHeroCar
     roadY += speedOfHeroCar
@@ -188,19 +181,14 @@ while running:
     villianTwoY += villianSpeed
     posOfHeroCarX += heroCarChangeX
 
-    # collution point for car one left(280,villianOneY-10) right(366,villianOneY+118)
     l1 = Point(280, villianOneY-10)
     r1 = Point(270+64+32, villianOneY+118)
 
-
-    # collution point for car two left(430,villianTwoY-5) right(511,villianTwoY+128)
     l2 = Point(430, villianTwoY-5)
     r2 = Point(415+64+32, villianTwoY+128)
 
-
-    # collution area of hero car  Point(posOfHeroCarX+20, posOfHeroCarY),  Point(posOfHeroCarX+128-35, posOfHeroCarY+130)
-    carLeftCorner = Point(posOfHeroCarX+20, posOfHeroCarY)
-    carRightCorner = Point(posOfHeroCarX+128-35, posOfHeroCarY+130)
+    carLeftCorner = Point(ai_car_x+20, ai_car_y)
+    carRightCorner = Point(ai_car_x+128-35, ai_car_y+130)
 
     showImg(pointImg, *l1.pos())
     showImg(pointImg2, *r1.pos())
@@ -209,14 +197,10 @@ while running:
     showImg(pointImg, *carLeftCorner.pos())
     showImg(pointImg2, *carRightCorner.pos())
 
-
-
-    if (doOverlap(l1, r1,carLeftCorner,carRightCorner)):
-        start+=1
-        print("Crushed",start)
-    if (doOverlap(l2, r2, carLeftCorner, carRightCorner)):
-        start+=1;
-        print("Crushed",start)
+    if doOverlap(l1, r1, carLeftCorner, carRightCorner):
+        start += 1
+        print(l1.x, l1.y, r1.x, r1.y, carLeftCorner.x, carLeftCorner.y, carRightCorner.x, carRightCorner.y)
+        print("Crushed", start)
 
     if isOutOfScreenY(height, imgLeftY):
         imgLeftY = -128
@@ -239,4 +223,5 @@ while running:
         heroCarChangeX = 0
     if posOfHeroCarX <= 210:
         heroCarChangeX = 0
+
     pygame.display.flip()
